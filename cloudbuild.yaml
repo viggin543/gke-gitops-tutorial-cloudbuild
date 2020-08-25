@@ -1,28 +1,25 @@
 #  gcloud builds submit --tag="gcr.io/adikastyle-dev/hello-cloudbuild:${COMMIT_ID}" .
 steps:
-- name: 'gcr.io/cloud-builders/go'
-  id: go_test
-  args: ['go', 'test', './...']
-- name: 'gcr.io/cloud-builders/go'
-  args: ['go', 'build', './...']
-- name: 'bash'
-  id: go_compile
-  args: ['ls', '-la']
-- name: 'gcr.io/cloud-builders/docker'
-  id: Build
-  args:
-  - 'build'
-  - '-t'
-  - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
-  - '.'
-- name: 'gcr.io/cloud-builders/docker'
-  id: Push
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
-options:
-  volumes:
-    - name: go-modules
-      path: /go
-  env:
-    - GO111MODULE=on
+  - name: 'gcr.io/cloud-builders/go'
+    id: Test
+    args:
+      - 'test'
+      - './...'
+  - name: 'gcr.io/cloud-builders/go'
+    id: Compile
+    args: ['build', './...']
+  - name: 'bash'
+    id: Log
+    args: ['ls', '-la']
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Build
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    id: Push
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
