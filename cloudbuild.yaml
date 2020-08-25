@@ -1,9 +1,13 @@
 #  gcloud builds submit --tag="gcr.io/adikastyle-dev/hello-cloudbuild:${COMMIT_ID}" .
 steps:
-- name: 'golang'
+- name: 'gcr.io/cloud-builders/go'
+  id: go_test
   args: ['go', 'test', './...']
-- name: 'golang'
+- name: 'gcr.io/cloud-builders/go'
   args: ['go', 'build', './...']
+- name: 'bash'
+  id: go_compile
+  args: ['ls', '-la']
 - name: 'gcr.io/cloud-builders/docker'
   id: Build
   args:
