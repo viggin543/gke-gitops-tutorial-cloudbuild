@@ -5,6 +5,6 @@ import (
 	"net/http"
 )
 
-func HelloServer(w http.ResponseWriter, r *http.Request) {
+var HelloWorldHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	_, _ = fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
-}
+})
