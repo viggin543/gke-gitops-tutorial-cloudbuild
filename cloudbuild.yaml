@@ -1,16 +1,19 @@
-#  gcloud builds submit --tag="gcr.io/adikastyle-dev/hello-cloudbuild:${COMMIT_ID}" .
+#  gcloud builds submit --substitutions SHORT_SHA="banana_$(git rev-parse --short=7 HEAD)" .
 steps:
-  - name: 'gcr.io/cloud-builders/go'
+
+  - name: 'golang'
     id: Test
-    args:
-      - 'test'
-      - './...'
-  - name: 'gcr.io/cloud-builders/go'
+    args: ['go','test', './...']
+  - name: 'golang'
     id: Compile
-    args: ['build', './...']
-  - name: 'bash'
+    args: ['go','build', '.']
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
     id: Log
-    args: ['ls', '-la']
+    args:
+      - '-c'
+      - |
+        ls -la ; env
   - name: 'gcr.io/cloud-builders/docker'
     id: Build
     args:
@@ -23,3 +26,10 @@ steps:
     args:
       - 'push'
       - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
+options:
+  volumes:
+    - name: go-modules
+      path: /go
+  env:
+    - GO111MODULE=on
+    - ROOT_PROJECT=github.com/viggin543/gke-gitops-tutorial-cloudbuild
