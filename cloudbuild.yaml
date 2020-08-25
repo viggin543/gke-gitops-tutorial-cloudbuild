@@ -1,14 +1,9 @@
-# [START cloudbuild]
+#  gcloud builds submit --tag="gcr.io/adikastyle-dev/hello-cloudbuild:${COMMIT_ID}" .
 steps:
-# This step runs the unit tests on the app
-- name: 'python:3.7-slim'
-  id: Test
-  entrypoint: /bin/sh
-  args:
-  - -c
-  - 'pip install flask && python test_app.py -v'
-
-# This step builds the container image.
+- name: 'golang'
+  args: ['go', 'test', './...']
+- name: 'golang'
+  args: ['go', 'build', './...']
 - name: 'gcr.io/cloud-builders/docker'
   id: Build
   args:
@@ -16,13 +11,14 @@ steps:
   - '-t'
   - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
   - '.'
-
-# This step pushes the image to Container Registry
-# The PROJECT_ID and SHORT_SHA variables are automatically
-# replaced by Cloud Build.
 - name: 'gcr.io/cloud-builders/docker'
   id: Push
   args:
   - 'push'
   - 'gcr.io/$PROJECT_ID/hello-cloudbuild:$SHORT_SHA'
-# [END cloudbuild]
+options:
+  volumes:
+    - name: go-modules
+      path: /go
+  env:
+    - GO111MODULE=on
